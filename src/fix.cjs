@@ -1,0 +1,6 @@
+const fs = require('fs')
+let code = fs.readFileSync('src/App.jsx', 'utf8')
+code = code.replace(/WebkitMaskImage:[^,]+,\s*/g, '')
+code = code.replace(/maskImage:[^}]+}/g, '}')
+fs.writeFileSync('src/App.jsx', code)
+console.log('Fixed!')
