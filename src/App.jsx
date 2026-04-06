@@ -1,11 +1,27 @@
 import { useState, useRef, useEffect } from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Link, useParams } from 'react-router-dom'
 
-const SONGS = [
-  { id: 1, title: "America", genre: "Hip Hop", duration: "3:45", price: 1.15, cover: null, preview: "/America.wav" },
-  { id: 2, title: "Human Tragedy", genre: "Indie", duration: "4:00", price: 1.15, cover: null, preview: "/Human Tragedy.wav" },
-  { id: 3, title: "My Shadow and I", genre: "Blues", duration: "3:30", price: 1.15, cover: null, preview: "/My Shadow and I.wav" }
+const ARTISTS = [
+  {
+    id: "vainmuze",
+    name: "VainMuze",
+    location: "Portland, Oregon",
+    established: "2004",
+    photo: "/VainMuze_avatar.png",
+    bio1: "A Portland songwriter and producer, rooted in the beautiful Pacific Northwest. For two decades I have been writing songs that do not apologize.",
+    bio2: "Hip hop that bleeds truth. Blues that aches. Indie anthems for the ones who will not give up. Cinematic pop for moments that deserve a score.",
+    bio3: "VainMuze started as an artist name. Now it is becoming a platform where independent voices sell their music directly, without gatekeepers.",
+    genres: ["Hip Hop", "Blues", "Indie", "Cinematic Pop"],
+    stats: [["20", "Years Writing"], ["4", "Genres"], ["∞", "Stories"]],
+    songs: [
+      { id: 1, title: "America", genre: "Hip Hop", duration: "3:45", price: 1.15, preview: "/America.wav", download: "/America.wav" },
+      { id: 2, title: "Human Tragedy", genre: "Indie", duration: "4:00", price: 1.15, preview: "/Human Tragedy.wav", download: "/Human Tragedy.wav" },
+      { id: 3, title: "My Shadow and I", genre: "Blues", duration: "3:30", price: 1.15, preview: "/My Shadow and I.wav", download: "/My Shadow and I.wav" }
+    ]
+  }
 ]
+
+const SONGS = ARTISTS.flatMap(a => a.songs.map(s => ({ ...s, artistId: a.id, artistName: a.name })))
 
 function AudioPlayer({ song, currentPlaying, setCurrentPlaying }) {
   const audioRef = useRef(null)
@@ -203,8 +219,9 @@ function Store({ addToCart, cart, removeFromCart }) {
             {SONGS.map(song => (
               <div key={song.id} style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", padding:"32px", borderRadius:"4px" }}>
                 <div style={{ fontSize:"10px", letterSpacing:"4px", textTransform:"uppercase", color:"#8a6f3f", marginBottom:"6px" }}>{song.genre}</div>
-                <h3 style={{ fontFamily:"Georgia, serif", fontSize:"20px", fontWeight:"700", marginBottom:"6px" }}>{song.title}</h3>
-                <p style={{ fontSize:"12px", color:"#7a7570", marginBottom:"12px" }}>{song.duration}</p>
+                <h3 style={{ fontFamily:"Georgia, serif", fontSize:"20px", fontWeight:"700", marginBottom:"4px" }}>{song.title}</h3>
+                <Link to={"/artists/"+song.artistId} style={{ fontSize:"11px", color:"#7a7570", textDecoration:"none", letterSpacing:"1px" }}>{song.artistName}</Link>
+                <p style={{ fontSize:"12px", color:"#7a7570", marginBottom:"12px", marginTop:"4px" }}>{song.duration}</p>
                 <div style={{ marginBottom:"16px" }}>
                   <AudioPlayer song={song} currentPlaying={currentPlaying} setCurrentPlaying={setCurrentPlaying} />
                 </div>
@@ -252,7 +269,7 @@ function Store({ addToCart, cart, removeFromCart }) {
                     <p style={{ margin:0, fontFamily:"Georgia, serif", fontSize:"18px", fontWeight:"bold" }}>{song.title}</p>
                     <p style={{ margin:0, color:"#7a7570", fontSize:"12px" }}>{song.genre}</p>
                   </div>
-                  <button style={{ padding:"8px 20px", background:"#c8a96e", color:"#060608", border:"none", cursor:"pointer", fontWeight:"bold" }}>Download</button>
+                  <a href={song.download} download style={{ padding:"8px 20px", background:"#c8a96e", color:"#060608", border:"none", cursor:"pointer", fontWeight:"bold", fontSize:"11px", textDecoration:"none", letterSpacing:"1px" }}>⬇ Download</a>
                 </div>
               ))
             }
@@ -296,20 +313,131 @@ function About() {
 function Artists() {
   return (
     <div style={{ background:"#060608", minHeight:"100vh", color:"#f0ece4", paddingTop:"100px" }}>
-      <div style={{ maxWidth:"900px", margin:"0 auto", padding:"60px 48px", textAlign:"center" }}>
-        <p style={{ fontSize:"10px", letterSpacing:"5px", textTransform:"uppercase", color:"#c8a96e", marginBottom:"12px" }}>For Artists</p>
-        <h1 style={{ fontFamily:"Georgia, serif", fontSize:"64px", fontWeight:"900", lineHeight:"1.1", marginBottom:"24px" }}>Your music.<br/><em style={{ color:"#c8a96e" }}>Your rules.</em></h1>
-        <p style={{ fontSize:"16px", color:"#7a7570", maxWidth:"560px", margin:"0 auto 80px", lineHeight:"1.8" }}>VainMuze is being built for independent artists who are tired of giving their work away. Sell directly. Keep what you earn. No labels. No gatekeepers.</p>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"16px", marginBottom:"80px", textAlign:"left" }}>
-          {[["🎵","Free to Join","No upfront costs. Upload and start selling immediately."],["💰","Keep Your Earnings","Direct Stripe payments. Your money goes straight to you."],["🔥","Built by an Artist","Made by a musician who understands what indie artists need."]].map(([icon,title,text]) => (
-            <div key={title} style={{ padding:"40px 32px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:"4px" }}>
-              <div style={{ fontSize:"28px", marginBottom:"16px" }}>{icon}</div>
-              <h3 style={{ fontFamily:"Georgia, serif", fontSize:"20px", fontWeight:"700", marginBottom:"12px" }}>{title}</h3>
-              <p style={{ fontSize:"14px", color:"#7a7570", lineHeight:"1.7", margin:0 }}>{text}</p>
+      <div style={{ maxWidth:"1100px", margin:"0 auto", padding:"60px 48px" }}>
+        <p style={{ fontSize:"10px", letterSpacing:"5px", textTransform:"uppercase", color:"#c8a96e", marginBottom:"12px", textAlign:"center" }}>For Artists</p>
+        <h1 style={{ fontFamily:"Georgia, serif", fontSize:"64px", fontWeight:"900", lineHeight:"1.1", marginBottom:"24px", textAlign:"center" }}>Your music.<br/><em style={{ color:"#c8a96e" }}>Your rules.</em></h1>
+        <p style={{ fontSize:"16px", color:"#7a7570", maxWidth:"560px", margin:"0 auto 80px", lineHeight:"1.8", textAlign:"center" }}>VainMuze is being built for independent artists who are tired of giving their work away. Sell directly. Keep what you earn. No labels. No gatekeepers.</p>
+
+        <h2 style={{ fontFamily:"Georgia, serif", fontSize:"32px", fontWeight:"700", marginBottom:"32px" }}>Featured Artists</h2>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(300px, 1fr))", gap:"16px", marginBottom:"80px" }}>
+          {ARTISTS.map(artist => (
+            <Link key={artist.id} to={"/artists/"+artist.id} style={{ textDecoration:"none" }}>
+              <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:"4px", overflow:"hidden" }}
+                onMouseEnter={e => e.currentTarget.style.borderColor="rgba(200,169,110,0.4)"}
+                onMouseLeave={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.06)"}>
+                <div style={{ height:"200px", overflow:"hidden", position:"relative" }}>
+                  <img src={artist.photo} alt={artist.name} style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top", filter:"grayscale(20%)" }} />
+                  <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(6,6,8,0.8) 0%, transparent 60%)" }}></div>
+                </div>
+                <div style={{ padding:"24px" }}>
+                  <div style={{ display:"flex", gap:"8px", flexWrap:"wrap", marginBottom:"12px" }}>
+                    {artist.genres.map(g => (
+                      <span key={g} style={{ fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#8a6f3f", background:"rgba(200,169,110,0.08)", padding:"3px 8px", borderRadius:"2px" }}>{g}</span>
+                    ))}
+                  </div>
+                  <h3 style={{ fontFamily:"Georgia, serif", fontSize:"24px", fontWeight:"700", color:"#f0ece4", marginBottom:"4px" }}>{artist.name}</h3>
+                  <p style={{ fontSize:"12px", color:"#7a7570", marginBottom:"16px" }}>{artist.location} — Est. {artist.established}</p>
+                  <p style={{ fontSize:"13px", color:"#c8a96e", letterSpacing:"2px", textTransform:"uppercase" }}>{artist.songs.length} Tracks →</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div style={{ borderTop:"1px solid rgba(200,169,110,0.1)", paddingTop:"80px" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"16px", marginBottom:"48px", textAlign:"left" }}>
+            {[["🎵","Free to Join","No upfront costs. Upload and start selling immediately."],["💰","Keep Your Earnings","Direct Stripe payments. Your money goes straight to you."],["🔥","Built by an Artist","Made by a musician who understands what indie artists need."]].map(([icon,title,text]) => (
+              <div key={title} style={{ padding:"40px 32px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:"4px" }}>
+                <div style={{ fontSize:"28px", marginBottom:"16px" }}>{icon}</div>
+                <h3 style={{ fontFamily:"Georgia, serif", fontSize:"20px", fontWeight:"700", marginBottom:"12px", color:"#f0ece4" }}>{title}</h3>
+                <p style={{ fontSize:"14px", color:"#7a7570", lineHeight:"1.7", margin:0 }}>{text}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign:"center" }}>
+            <a href="mailto:hello@vainmuze.com" style={{ display:"inline-block", padding:"16px 48px", background:"transparent", border:"1px solid #c8a96e", color:"#c8a96e", fontSize:"12px", letterSpacing:"4px", textTransform:"uppercase", textDecoration:"none" }}>Join the Waitlist</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ArtistProfile({ addToCart, cart }) {
+  const { artistId } = useParams()
+  const [profilePlaying, setProfilePlaying] = useState(null)
+  const artist = ARTISTS.find(a => a.id === artistId)
+
+  if (!artist) return (
+    <div style={{ background:"#060608", minHeight:"100vh", color:"#f0ece4", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
+      <h1 style={{ fontFamily:"Georgia, serif", fontSize:"48px", color:"#c8a96e", marginBottom:"24px" }}>Artist not found</h1>
+      <Link to="/artists" style={{ color:"#7a7570", textDecoration:"none", letterSpacing:"3px", textTransform:"uppercase", fontSize:"12px" }}>← Back to Artists</Link>
+    </div>
+  )
+
+  return (
+    <div style={{ background:"#060608", minHeight:"100vh", color:"#f0ece4" }}>
+      <div style={{ position:"relative", height:"70vh", display:"flex", alignItems:"flex-end", overflow:"hidden" }}>
+        <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 60% 40%, rgba(200,169,110,0.06) 0%, transparent 60%)" }}></div>
+        <img src={artist.photo} alt={artist.name} style={{ position:"absolute", right:0, top:0, width:"50%", height:"100%", objectFit:"cover", objectPosition:"center top", opacity:0.85 }} />
+        <div style={{ position:"absolute", inset:0, background:"linear-gradient(to right, rgba(6,6,8,1) 40%, transparent 70%)" }}></div>
+        <div style={{ position:"relative", zIndex:2, padding:"0 48px 60px", maxWidth:"580px" }}>
+          <Link to="/artists" style={{ fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none", display:"block", marginBottom:"24px" }}>← All Artists</Link>
+          <div style={{ display:"flex", gap:"8px", flexWrap:"wrap", marginBottom:"16px" }}>
+            {artist.genres.map(g => (
+              <span key={g} style={{ fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#8a6f3f", background:"rgba(200,169,110,0.08)", padding:"3px 8px", borderRadius:"2px" }}>{g}</span>
+            ))}
+          </div>
+          <h1 style={{ fontFamily:"Georgia, serif", fontSize:"72px", fontWeight:"900", lineHeight:"0.95", marginBottom:"16px" }}>{artist.name}</h1>
+          <p style={{ fontSize:"11px", letterSpacing:"4px", textTransform:"uppercase", color:"#c8a96e" }}>{artist.location} — Est. {artist.established}</p>
+        </div>
+      </div>
+
+      <div style={{ maxWidth:"1100px", margin:"0 auto", padding:"80px 48px" }}>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"80px", marginBottom:"80px" }}>
+          <div>
+            <p style={{ fontSize:"10px", letterSpacing:"5px", textTransform:"uppercase", color:"#c8a96e", marginBottom:"24px" }}>About</p>
+            <p style={{ fontSize:"16px", lineHeight:"1.9", color:"#7a7570", marginBottom:"20px" }}>{artist.bio1}</p>
+            <p style={{ fontSize:"16px", lineHeight:"1.9", color:"#7a7570", marginBottom:"20px" }}>{artist.bio2}</p>
+            <p style={{ fontSize:"16px", lineHeight:"1.9", color:"#7a7570" }}>{artist.bio3}</p>
+          </div>
+          <div>
+            <p style={{ fontSize:"10px", letterSpacing:"5px", textTransform:"uppercase", color:"#c8a96e", marginBottom:"24px" }}>By the Numbers</p>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"16px" }}>
+              {artist.stats.map(([n,l]) => (
+                <div key={l} style={{ padding:"32px 24px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.04)", textAlign:"center" }}>
+                  <div style={{ fontFamily:"Georgia, serif", fontSize:"48px", color:"#c8a96e", lineHeight:"1", marginBottom:"8px" }}>{n}</div>
+                  <div style={{ fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570" }}>{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <p style={{ fontSize:"10px", letterSpacing:"5px", textTransform:"uppercase", color:"#c8a96e", marginBottom:"12px" }}>Tracks</p>
+        <h2 style={{ fontFamily:"Georgia, serif", fontSize:"36px", fontWeight:"700", marginBottom:"40px" }}>Music by {artist.name}</h2>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))", gap:"16px" }}>
+          {artist.songs.map((song, i) => (
+            <div key={song.id} style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", padding:"32px", borderRadius:"4px" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor="rgba(200,169,110,0.3)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.06)"}>
+              <div style={{ fontFamily:"Georgia, serif", fontSize:"48px", color:"rgba(200,169,110,0.1)", lineHeight:"1", marginBottom:"12px" }}>0{i+1}</div>
+              <div style={{ fontSize:"10px", letterSpacing:"4px", textTransform:"uppercase", color:"#8a6f3f", marginBottom:"6px" }}>{song.genre}</div>
+              <h3 style={{ fontFamily:"Georgia, serif", fontSize:"20px", fontWeight:"700", marginBottom:"6px" }}>{song.title}</h3>
+              <p style={{ fontSize:"12px", color:"#7a7570", marginBottom:"16px" }}>{song.duration}</p>
+              <div style={{ marginBottom:"16px" }}>
+                <AudioPlayer song={song} currentPlaying={profilePlaying} setCurrentPlaying={setProfilePlaying} />
+              </div>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <span style={{ fontFamily:"Georgia, serif", fontSize:"24px", color:"#c8a96e" }}>${song.price}</span>
+                <button onClick={() => addToCart(song)} disabled={!!cart.find(s => s.id === song.id)}
+                  style={{ padding:"10px 20px", background:cart.find(s => s.id === song.id) ? "#333" : "#c8a96e", color:cart.find(s => s.id === song.id) ? "#7a7570" : "#060608", border:"none", fontSize:"11px", cursor:"pointer", fontWeight:"bold" }}>
+                  {cart.find(s => s.id === song.id) ? "Added" : "+ Add"}
+                </button>
+              </div>
             </div>
           ))}
         </div>
-        <a href="mailto:hello@vainmuze.com" style={{ display:"inline-block", padding:"16px 48px", background:"transparent", border:"1px solid #c8a96e", color:"#c8a96e", fontSize:"12px", letterSpacing:"4px", textTransform:"uppercase", textDecoration:"none" }}>Join the Waitlist</a>
       </div>
     </div>
   )
@@ -317,14 +445,34 @@ function Artists() {
 
 function Footer() {
   return (
-    <footer style={{ padding:"48px", borderTop:"1px solid #1a1a1a", display:"flex", justifyContent:"space-between", alignItems:"center", background:"#060608", color:"#f0ece4" }}>
-      <span style={{ fontFamily:"Georgia, serif", fontSize:"20px", letterSpacing:"4px", color:"#c8a96e", fontWeight:"bold" }}>VAINMUZE</span>
-      <span style={{ fontSize:"12px", color:"#7a7570" }}>2026 VainMuze — Portland, OR</span>
-      <div style={{ display:"flex", gap:"32px" }}>
-        <Link to="/" style={{ fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none" }}>Home</Link>
-        <Link to="/store" style={{ fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none" }}>Store</Link>
-        <Link to="/about" style={{ fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none" }}>About</Link>
-        <Link to="/artists" style={{ fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none" }}>Artists</Link>
+    <footer style={{ padding:"48px", borderTop:"1px solid #1a1a1a", background:"#060608", color:"#f0ece4" }}>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"32px" }}>
+        <span style={{ fontFamily:"Georgia, serif", fontSize:"20px", letterSpacing:"4px", color:"#c8a96e", fontWeight:"bold" }}>VAINMUZE</span>
+        <div style={{ display:"flex", gap:"24px", alignItems:"center" }}>
+          <a href="https://www.youtube.com/@VainMuze" target="_blank" rel="noopener noreferrer"
+            style={{ display:"flex", alignItems:"center", gap:"8px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none", transition:"color 0.2s" }}
+            onMouseEnter={e => e.currentTarget.style.color="#c8a96e"}
+            onMouseLeave={e => e.currentTarget.style.color="#7a7570"}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            YouTube
+          </a>
+          <a href="https://www.tiktok.com/@vainmuze1" target="_blank" rel="noopener noreferrer"
+            style={{ display:"flex", alignItems:"center", gap:"8px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none", transition:"color 0.2s" }}
+            onMouseEnter={e => e.currentTarget.style.color="#c8a96e"}
+            onMouseLeave={e => e.currentTarget.style.color="#7a7570"}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+            TikTok
+          </a>
+        </div>
+      </div>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingTop:"24px", borderTop:"1px solid #1a1a1a" }}>
+        <span style={{ fontSize:"12px", color:"#7a7570" }}>2026 VainMuze — Portland, OR</span>
+        <div style={{ display:"flex", gap:"32px" }}>
+          <Link to="/" style={{ fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none" }}>Home</Link>
+          <Link to="/store" style={{ fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none" }}>Store</Link>
+          <Link to="/about" style={{ fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none" }}>About</Link>
+          <Link to="/artists" style={{ fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none" }}>Artists</Link>
+        </div>
       </div>
     </footer>
   )
@@ -343,6 +491,7 @@ export default function App() {
         <Route path="/store" element={<Store addToCart={addToCart} cart={cart} removeFromCart={removeFromCart} />} />
         <Route path="/about" element={<About />} />
         <Route path="/artists" element={<Artists />} />
+        <Route path="/artists/:artistId" element={<ArtistProfile addToCart={addToCart} cart={cart} />} />
       </Routes>
       <Footer />
     </>
