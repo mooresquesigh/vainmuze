@@ -16,7 +16,13 @@ const ARTISTS = [
     songs: [
       { id: 1, title: "America", genre: "Hip Hop", duration: "3:45", price: 1.15, preview: "/America.wav", download: "/America.wav" },
       { id: 2, title: "Human Tragedy", genre: "Indie", duration: "4:00", price: 1.15, preview: "/Human Tragedy.wav", download: "/Human Tragedy.wav" },
-      { id: 3, title: "My Shadow and I", genre: "Blues", duration: "3:30", price: 1.15, preview: "/My Shadow and I.wav", download: "/My Shadow and I.wav" }
+      { id: 3, title: "My Shadow and I", genre: "Blues", duration: "3:30", price: 1.15, preview: "/My Shadow and I.wav", download: "/My Shadow and I.wav" },
+      { id: 4, title: "Crying", genre: "Indie Pop", duration: "3:30", price: 1.15, preview: "/Crying.wav", download: "/Crying.wav" },
+      { id: 5, title: "Falling", genre: "Indie", duration: "3:30", price: 1.15, preview: "/Falling.wav", download: "/Falling.wav" },
+      { id: 6, title: "I Pray for You", genre: "Indie", duration: "3:30", price: 1.15, preview: "/I Pray for You.wav", download: "/I Pray for You.wav" },
+      { id: 7, title: "Maybe in the Next Hour", genre: "Blues", duration: "3:30", price: 1.15, preview: "/Maybe in the Next Hour.wav", download: "/Maybe in the Next Hour.wav" },
+      { id: 8, title: "My Life", genre: "Indie", duration: "3:30", price: 1.15, preview: "/My Life.wav", download: "/My Life.wav" },
+      { id: 9, title: "Pretty for Me", genre: "Blues", duration: "3:30", price: 1.15, preview: "/Pretty for Me.wav", download: "/Pretty for Me.wav" }
     ]
   }
 ]
@@ -95,6 +101,7 @@ function Nav({ cart }) {
 
 function Home({ addToCart, cart }) {
   const [homePlaying, setHomePlaying] = useState(null)
+  const featured = SONGS.slice(0, 3)
 
   return (
     <div style={{ background:"#060608", minHeight:"100vh", color:"#f0ece4" }}>
@@ -144,7 +151,7 @@ function Home({ addToCart, cart }) {
           <Link to="/store" style={{ fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none", borderBottom:"1px solid #7a7570", paddingBottom:"2px" }}>View All →</Link>
         </div>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"16px" }}>
-          {SONGS.map((song, i) => (
+          {featured.map((song, i) => (
             <div key={song.id} style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", padding:"32px", borderRadius:"4px" }}
               onMouseEnter={e => e.currentTarget.style.borderColor="rgba(200,169,110,0.3)"}
               onMouseLeave={e => e.currentTarget.style.borderColor="rgba(255,255,255,0.06)"}>
@@ -181,7 +188,7 @@ function Home({ addToCart, cart }) {
 
       <div style={{ padding:"80px 48px", maxWidth:"1100px", margin:"0 auto" }}>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"2px" }}>
-          {[["20+","Years of Music"],["3","Genres & Growing"],["$1.15","Per Track"],["100%","Independent"]].map(([num, label]) => (
+          {[["20+","Years of Music"],["9","Tracks & Growing"],["$1.15","Per Track"],["100%","Independent"]].map(([num, label]) => (
             <div key={label} style={{ padding:"40px 32px", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.04)", textAlign:"center" }}>
               <div style={{ fontFamily:"Georgia, serif", fontSize:"48px", color:"#c8a96e", fontWeight:"900", marginBottom:"8px" }}>{num}</div>
               <div style={{ fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", color:"#7a7570" }}>{label}</div>
@@ -450,14 +457,14 @@ function Footer() {
         <span style={{ fontFamily:"Georgia, serif", fontSize:"20px", letterSpacing:"4px", color:"#c8a96e", fontWeight:"bold" }}>VAINMUZE</span>
         <div style={{ display:"flex", gap:"24px", alignItems:"center" }}>
           <a href="https://www.youtube.com/@VainMuze" target="_blank" rel="noopener noreferrer"
-            style={{ display:"flex", alignItems:"center", gap:"8px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none", transition:"color 0.2s" }}
+            style={{ display:"flex", alignItems:"center", gap:"8px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none" }}
             onMouseEnter={e => e.currentTarget.style.color="#c8a96e"}
             onMouseLeave={e => e.currentTarget.style.color="#7a7570"}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
             YouTube
           </a>
           <a href="https://www.tiktok.com/@vainmuze1" target="_blank" rel="noopener noreferrer"
-            style={{ display:"flex", alignItems:"center", gap:"8px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none", transition:"color 0.2s" }}
+            style={{ display:"flex", alignItems:"center", gap:"8px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#7a7570", textDecoration:"none" }}
             onMouseEnter={e => e.currentTarget.style.color="#c8a96e"}
             onMouseLeave={e => e.currentTarget.style.color="#7a7570"}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
