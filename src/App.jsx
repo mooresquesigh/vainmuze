@@ -1,12 +1,65 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 
 const SONGS = [
-  { id: 1, title: "America This, America That", genre: "Hip Hop", duration: "3:45", price: 1.15, cover: "🎤" },
-  { id: 2, title: "I Won't Give Up", genre: "Indie", duration: "4:00", price: 1.15, cover: "✊" },
-  { id: 3, title: "My Shadow and I", genre: "Blues", duration: "3:30", price: 1.15, cover: "🎸" }
+  { id: 1, title: "America", genre: "Hip Hop", duration: "3:45", price: 1.15, cover: null, preview: "/America.wav" },
+  { id: 2, title: "Human Tragedy", genre: "Indie", duration: "4:00", price: 1.15, cover: null, preview: "/Human Tragedy.wav" },
+  { id: 3, title: "My Shadow and I", genre: "Blues", duration: "3:30", price: 1.15, cover: null, preview: "/My Shadow and I.wav" }
 ]
+function AudioPlayer({ song, currentPlaying, setCurrentPlaying }) {
+  const audioRef = useRef(null)
+  const isPlaying = currentPlaying === song.id
 
+  useEffect(() => {
+    if (!isPlaying && audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+    }
+  }, [isPlaying])
+
+  const toggle = () => {
+    if (isPlaying) {
+      setCurrentPlaying(null)
+    } else {
+      setCurrentPlaying(song.id)
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.currentTime = 0
+          audioRef.current.play()
+        }
+      }, 50)
+    }
+  }
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current && audioRef.current.currentTime >= 30) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+      setCurrentPlaying(null)
+    }
+  }
+
+  return (
+    <>
+      <audio ref={audioRef} src={song.preview} onTimeUpdate={handleTimeUpdate} />
+      <button onClick={toggle} style={{
+        padding: "8px 16px",
+        background: isPlaying ? "rgba(200,169,110,0.15)" : "transparent",
+        border: "1px solid rgba(200,169,110,0.4)",
+        color: "#c8a96e",
+        fontSize: "11px",
+        letterSpacing: "2px",
+        textTransform: "uppercase",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px"
+      }}>
+        {isPlaying ? "⏸ Stop" : "▶ Preview"}
+      </button>
+    </>
+  )
+}
 function Nav({ cart }) {
   return (
     <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:100, display:"flex", justifyContent:"space-between", alignItems:"center", padding:"20px 48px", background:"rgba(6,6,8,0.98)", borderBottom:"1px solid #1a1a1a" }}>
@@ -119,6 +172,7 @@ function Home({ addToCart, cart }) {
 
 function Store({ addToCart, cart, removeFromCart }) {
   const [view, setView] = useState("store")
+  const [currentPlaying, setCurrentPlaying] = useState(null)
   const [purchased, setPurchased] = useState([])
   const total = cart.reduce((sum, s) => sum + s.price, 0).toFixed(2)
   const handleCheckout = () => { setPurchased([...purchased, ...cart]); alert("Thank you! Downloads ready.") }
@@ -144,8 +198,11 @@ function Store({ addToCart, cart, removeFromCart }) {
                 <div style={{ fontSize:"48px", textAlign:"center", marginBottom:"16px" }}>{song.cover}</div>
                 <div style={{ fontSize:"10px", letterSpacing:"4px", textTransform:"uppercase", color:"#8a6f3f", marginBottom:"6px" }}>{song.genre}</div>
                 <h3 style={{ fontFamily:"Georgia, serif", fontSize:"20px", fontWeight:"700", marginBottom:"6px" }}>{song.title}</h3>
-                <p style={{ fontSize:"12px", color:"#7a7570", marginBottom:"20px" }}>{song.duration}</p>
-                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <p style={{ fontSize:"12px", color:"#7a7570", marginBottom:"12px" }}>{song.duration}</p>
+<div style={{ marginBottom:"16px" }}>
+  <AudioPlayer song={song} currentPlaying={currentPlaying} setCurrentPlaying={setCurrentPlaying} />
+</div>
+<div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                   <span style={{ fontFamily:"Georgia, serif", fontSize:"24px", color:"#c8a96e" }}>${song.price}</span>
                   <button onClick={() => addToCart(song)} disabled={!!cart.find(s => s.id === song.id)}
                     style={{ padding:"10px 20px", background:cart.find(s => s.id === song.id) ? "#333" : "#c8a96e", color:cart.find(s => s.id === song.id) ? "#7a7570" : "#060608", border:"none", fontSize:"11px", cursor:"pointer", fontWeight:"bold" }}>
