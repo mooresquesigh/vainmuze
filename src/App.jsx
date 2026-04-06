@@ -6,6 +6,7 @@ const SONGS = [
   { id: 2, title: "Human Tragedy", genre: "Indie", duration: "4:00", price: 1.15, cover: null, preview: "/Human Tragedy.wav" },
   { id: 3, title: "My Shadow and I", genre: "Blues", duration: "3:30", price: 1.15, cover: null, preview: "/My Shadow and I.wav" }
 ]
+
 function AudioPlayer({ song, currentPlaying, setCurrentPlaying }) {
   const audioRef = useRef(null)
   const isPlaying = currentPlaying === song.id
@@ -60,6 +61,7 @@ function AudioPlayer({ song, currentPlaying, setCurrentPlaying }) {
     </>
   )
 }
+
 function Nav({ cart }) {
   return (
     <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:100, display:"flex", justifyContent:"space-between", alignItems:"center", padding:"20px 48px", background:"rgba(6,6,8,0.98)", borderBottom:"1px solid #1a1a1a" }}>
@@ -76,6 +78,8 @@ function Nav({ cart }) {
 }
 
 function Home({ addToCart, cart }) {
+  const [homePlaying, setHomePlaying] = useState(null)
+
   return (
     <div style={{ background:"#060608", minHeight:"100vh", color:"#f0ece4" }}>
       <div style={{ position:"relative", height:"100vh", display:"flex", alignItems:"flex-end", overflow:"hidden" }}>
@@ -131,7 +135,10 @@ function Home({ addToCart, cart }) {
               <div style={{ fontFamily:"Georgia, serif", fontSize:"56px", color:"rgba(200,169,110,0.1)", lineHeight:"1", marginBottom:"16px" }}>0{i+1}</div>
               <div style={{ fontSize:"10px", letterSpacing:"4px", textTransform:"uppercase", color:"#8a6f3f", marginBottom:"8px" }}>{song.genre}</div>
               <h3 style={{ fontFamily:"Georgia, serif", fontSize:"20px", fontWeight:"700", marginBottom:"8px" }}>{song.title}</h3>
-              <p style={{ fontSize:"12px", color:"#7a7570", marginBottom:"24px" }}>{song.duration}</p>
+              <p style={{ fontSize:"12px", color:"#7a7570", marginBottom:"16px" }}>{song.duration}</p>
+              <div style={{ marginBottom:"16px" }}>
+                <AudioPlayer song={song} currentPlaying={homePlaying} setCurrentPlaying={setHomePlaying} />
+              </div>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                 <span style={{ fontFamily:"Georgia, serif", fontSize:"24px", color:"#c8a96e" }}>${song.price}</span>
                 <button onClick={() => addToCart(song)} disabled={!!cart.find(s => s.id === song.id)}
@@ -195,14 +202,13 @@ function Store({ addToCart, cart, removeFromCart }) {
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))", gap:"16px" }}>
             {SONGS.map(song => (
               <div key={song.id} style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", padding:"32px", borderRadius:"4px" }}>
-                <div style={{ fontSize:"48px", textAlign:"center", marginBottom:"16px" }}>{song.cover}</div>
                 <div style={{ fontSize:"10px", letterSpacing:"4px", textTransform:"uppercase", color:"#8a6f3f", marginBottom:"6px" }}>{song.genre}</div>
                 <h3 style={{ fontFamily:"Georgia, serif", fontSize:"20px", fontWeight:"700", marginBottom:"6px" }}>{song.title}</h3>
                 <p style={{ fontSize:"12px", color:"#7a7570", marginBottom:"12px" }}>{song.duration}</p>
-<div style={{ marginBottom:"16px" }}>
-  <AudioPlayer song={song} currentPlaying={currentPlaying} setCurrentPlaying={setCurrentPlaying} />
-</div>
-<div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <div style={{ marginBottom:"16px" }}>
+                  <AudioPlayer song={song} currentPlaying={currentPlaying} setCurrentPlaying={setCurrentPlaying} />
+                </div>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                   <span style={{ fontFamily:"Georgia, serif", fontSize:"24px", color:"#c8a96e" }}>${song.price}</span>
                   <button onClick={() => addToCart(song)} disabled={!!cart.find(s => s.id === song.id)}
                     style={{ padding:"10px 20px", background:cart.find(s => s.id === song.id) ? "#333" : "#c8a96e", color:cart.find(s => s.id === song.id) ? "#7a7570" : "#060608", border:"none", fontSize:"11px", cursor:"pointer", fontWeight:"bold" }}>
