@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Routes, Route, Link, useParams } from 'react-router-dom'
+import { Routes, Route, Link, useParams, useSearchParams } from 'react-router-dom'
 
 const ARTISTS = [
   {
@@ -28,6 +28,24 @@ const ARTISTS = [
 ]
 
 const SONGS = ARTISTS.flatMap(a => a.songs.map(s => ({ ...s, artistId: a.id, artistName: a.name })))
+
+async function handleStripeCheckout(cartItems) {
+  try {
+    const response = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cartItems })
+    })
+    const data = await response.json()
+    if (data.url) {
+      window.location.href = data.url
+    } else {
+      alert('Payment error: ' + (data.error || 'Unknown error'))
+    }
+  } catch (error) {
+    alert('Payment error: ' + error.message)
+  }
+}
 
 function AudioPlayer({ song, currentPlaying, setCurrentPlaying }) {
   const audioRef = useRef(null)
@@ -204,8 +222,14 @@ function Store({ addToCart, cart, removeFromCart }) {
   const [view, setView] = useState("store")
   const [currentPlaying, setCurrentPlaying] = useState(null)
   const [purchased, setPurchased] = useState([])
+  const [loading, setLoading] = useState(false)
   const total = cart.reduce((sum, s) => sum + s.price, 0).toFixed(2)
-  const handleCheckout = () => { setPurchased([...purchased, ...cart]); alert("Thank you! Downloads ready.") }
+
+  const handleCheckout = async () => {
+    setLoading(true)
+    await handleStripeCheckout(cart)
+    setLoading(false)
+  }
 
   return (
     <div style={{ background:"#060608", minHeight:"100vh", color:"#f0ece4", paddingTop:"100px" }}>
@@ -261,7 +285,10 @@ function Store({ addToCart, cart, removeFromCart }) {
                 ))}
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingTop:"32px", marginTop:"32px", borderTop:"1px solid #222" }}>
                   <p style={{ fontFamily:"Georgia, serif", fontSize:"28px", margin:0 }}>Total: ${total}</p>
-                  <button onClick={handleCheckout} style={{ padding:"14px 40px", background:"#c8a96e", color:"#060608", border:"none", fontSize:"12px", letterSpacing:"3px", textTransform:"uppercase", cursor:"pointer", fontWeight:"bold" }}>Checkout</button>
+                  <button onClick={handleCheckout} disabled={loading}
+                    style={{ padding:"14px 40px", background:"#c8a96e", color:"#060608", border:"none", fontSize:"12px", letterSpacing:"3px", textTransform:"uppercase", cursor:"pointer", fontWeight:"bold", opacity: loading ? 0.7 : 1 }}>
+                    {loading ? "Redirecting..." : "Checkout with Stripe"}
+                  </button>
                 </div>
               </div>
             )}
@@ -283,6 +310,28 @@ function Store({ addToCart, cart, removeFromCart }) {
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function Success() {
+  return (
+    <div style={{ background:"#060608", minHeight:"100vh", color:"#f0ece4", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"48px" }}>
+      <div style={{ fontSize:"64px", marginBottom:"24px" }}>🎵</div>
+      <h1 style={{ fontFamily:"Georgia, serif", fontSize:"48px", fontWeight:"900", color:"#c8a96e", marginBottom:"16px" }}>Thank You!</h1>
+      <p style={{ fontSize:"18px", color:"#7a7570", maxWidth:"480px", lineHeight:"1.8", marginBottom:"48px" }}>Your payment was successful. Your music is ready. Check your email for your receipt from Stripe.</p>
+      <Link to="/store" style={{ padding:"14px 36px", background:"#c8a96e", color:"#060608", fontSize:"12px", letterSpacing:"3px", textTransform:"uppercase", textDecoration:"none", fontWeight:"bold" }}>Back to Store</Link>
+    </div>
+  )
+}
+
+function Cancel() {
+  return (
+    <div style={{ background:"#060608", minHeight:"100vh", color:"#f0ece4", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", textAlign:"center", padding:"48px" }}>
+      <div style={{ fontSize:"64px", marginBottom:"24px" }}>😔</div>
+      <h1 style={{ fontFamily:"Georgia, serif", fontSize:"48px", fontWeight:"900", marginBottom:"16px" }}>Payment Cancelled</h1>
+      <p style={{ fontSize:"18px", color:"#7a7570", maxWidth:"480px", lineHeight:"1.8", marginBottom:"48px" }}>No worries — your cart is still waiting for you. Come back whenever you are ready.</p>
+      <Link to="/store" style={{ padding:"14px 36px", background:"#c8a96e", color:"#060608", fontSize:"12px", letterSpacing:"3px", textTransform:"uppercase", textDecoration:"none", fontWeight:"bold" }}>Back to Store</Link>
     </div>
   )
 }
@@ -499,6 +548,8 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/artists" element={<Artists />} />
         <Route path="/artists/:artistId" element={<ArtistProfile addToCart={addToCart} cart={cart} />} />
+        <Route path="/success" element={<Success />} />
+        <Route path="/cancel" element={<Cancel />} />
       </Routes>
       <Footer />
     </>
