@@ -212,7 +212,7 @@ function Nav({ cart }) {
   const leftOffset = user ? `${SIDEBAR_WIDTH}px` : "0"
 
   return (
-    <nav style={{ position:"fixed", top:0, left:leftOffset, right:0, zIndex:100, display:"flex", justifyContent:"space-between", alignItems:"center", padding:"18px 48px", background:"rgba(6,6,8,0.98)", borderBottom:"1px solid #1a1a1a" }}>
+    <nav style={{ position:"fixed", top:0, left:leftOffset, right:0, zIndex:100, display:"flex", justifyContent:"space-between", alignItems:"center", gap:"32px", padding:"18px 48px", background:"rgba(6,6,8,0.98)", borderBottom:"1px solid #1a1a1a" }}>
       {!user && (
         <Link to="/" style={{ fontSize:"22px", letterSpacing:"4px", color:"#c8a96e", textDecoration:"none", fontWeight:"bold" }}>VAINMUZE</Link>
       )}
